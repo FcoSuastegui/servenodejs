@@ -4,11 +4,11 @@ import pool from '../database';
 class GamesController {
     
     public async games( req:Request, res:Response ): Promise<any> {
-       const games = await pool.query('SELECT * FROM games');
+       const games = await pool.query('call games.getGames()');
        if( games.length > 0 ){
            return res.json({
                status: true,
-               games: games
+               games: games[0]
             });
         }
 
@@ -22,11 +22,11 @@ class GamesController {
     
     public async game( req:Request, res:Response ): Promise<any> {
         const { id } = req.params;
-        const game = await pool.query('SELECT * FROM games WHERE id = ?', [id]);
+        const game = await pool.query('call games.getGame(?)', [id]);
         if( game.length > 0 ) {
             return res.json({
                 status: true,
-                game: game[0]
+                game: game[0][0]
             });
         }
 
@@ -38,7 +38,8 @@ class GamesController {
     }
 
     public async create( req: Request, res: Response ): Promise<void> {
-        await pool.query('INSERT INTO games SET ?', [req.body]);
+        const game = req.body;
+        await pool.query('call addGame(?,?,?) ', [game.title, game.description, game.image]);
         res.json({
             message: 'Games add',
             status: true
@@ -47,7 +48,7 @@ class GamesController {
 
     public async delete( req: Request, res: Response ): Promise<void> {
         const { id } = req.params;
-        const game = await pool.query('DELETE FROM games WHERE id = ?', [id]);
+        const game = await pool.query('call deleteGame(?)', [id]);
         res.json({
             message: 'Se ha eliminado correctamente'
         });
@@ -56,7 +57,7 @@ class GamesController {
     public async update( req: Request, res: Response ): Promise<void> {
         const { id } = req.params;
         const body = req.body;
-        await pool.query('UPDATE games SET ? WHERE id = ?', [body, id]);
+        await pool.query('call updateGame(?,?,?,?)', [id, body.title, body.description, body.image]);
         res.json({
             message: 'Se ha actulizado correctamente'
         });
