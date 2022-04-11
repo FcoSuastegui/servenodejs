@@ -1,6 +1,8 @@
 import express, { Application } from 'express';
 import morgan from 'morgan'
 import cors from 'cors';
+import dotenv from 'dotenv'
+
 
 
 import indexRoutes from './routes/indexRoutes';
@@ -43,6 +45,6 @@ class Server {
 }
 
 
+dotenv.config()
 const server = new Server();
-
 server.start();
